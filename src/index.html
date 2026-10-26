@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>appendChildSlotFix repro</title>
+  <script type="module" src="/build/repro.esm.js"></script>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; margin: 2rem; max-width: 46rem; }
+    table { border-collapse: collapse; margin-top: 1rem; }
+    th, td { border: 1px solid #ccc; padding: 0.3rem 0.8rem; text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+    #stage { display: none; }
+  </style>
+</head>
+<body>
+  <h1>appendChildSlotFix repro</h1>
+  <p>
+    Both components render a single <code>&lt;slot&gt;</code>. <code>&lt;light-list&gt;</code> doesn't use
+    shadow DOM, so with <code>appendChildSlotFix</code> on, Stencil replaces its <code>appendChild</code>.
+    <code>&lt;shadow-list&gt;</code> uses shadow DOM, so the browser's own <code>appendChild</code> is used.
+  </p>
+  <p>The button times how long it takes to append children one at a time to each component.</p>
+  <button id="run">Run</button>
+  <table>
+    <thead><tr><th>Children appended</th><th>&lt;light-list&gt;</th><th>&lt;shadow-list&gt;</th></tr></thead>
+    <tbody id="results"></tbody>
+  </table>
+  <div id="stage"></div>
+  <script type="module">
+    const sizes = [250, 500, 1000, 2000];
+
+    async function time(tag, count) {
+      const list = document.createElement(tag);
+      document.getElementById("stage").append(list);
+      await customElements.whenDefined(tag);
+      await list.componentOnReady();
+      const start = performance.now();
+      for (let i = 0; i < count; i++) {
+        const child = document.createElement("div");
+        child.textContent = `Child ${i}`;
+        list.appendChild(child);
+      }
+      const ms = performance.now() - start;
+      list.remove();
+      return ms;
+    }
+
+    document.getElementById("run").addEventListener("click", async () => {
+      const results = document.getElementById("results");
+      results.innerHTML = "";
+      for (const count of sizes) {
+        const light = await time("light-list", count);
+        const shadow = await time("shadow-list", count);
+        results.insertAdjacentHTML("beforeend",
+          `<tr><td>${count}</td><td>${light.toFixed(1)}ms</td><td>${shadow.toFixed(1)}ms</td></tr>`);
+      }
+      window.__done = true;
+    });
+  </script>
+</body>
+</html>

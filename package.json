@@ -1,0 +1,12 @@
+{
+  "name": "stencil-slot-append-repro",
+  "private": true,
+  "description": "Shows that appendChildSlotFix makes each appended child slower to add than the last.",
+  "scripts": {
+    "build": "stencil build",
+    "start": "stencil build --dev --watch --serve"
+  },
+  "devDependencies": {
+    "@stencil/core": "4.45.2"
+  }
+}

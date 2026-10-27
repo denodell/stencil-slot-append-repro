@@ -1,6 +1,6 @@
 # appendChildSlotFix repro
 
-With `appendChildSlotFix` turned on, appending children one at a time to a Stencil component that uses slots without shadow DOM gets slower with each child. Doubling the number of children makes it take three to four times as long.
+With `appendChildSlotFix` turned on, appending children one at a time to a Stencil component that uses slots without shadow DOM gets slower with each child. Doubling the number of children makes appending them take three to four times as long.
 
 The page has two components that are identical apart from shadow DOM:
 
@@ -16,7 +16,7 @@ npm start
 
 Then open the page it serves and press **Run**. It appends 250, 500, 1,000 and 2,000 children to each component, one `appendChild` call at a time, and shows how long each took.
 
-## What you'll see
+## Expected results
 
 With the CPU slowed down 4x in Chrome 155:
 
@@ -29,10 +29,10 @@ With the CPU slowed down 4x in Chrome 155:
 
 With `appendChildSlotFix: false` in `stencil.config.ts`, both components take under 20ms at every size.
 
-## Where it comes from
+## Cause
 
 Each call to the replaced `appendChild` checks all of the host's existing child nodes to find the slot the new node belongs in, then checks them all again to work out where to insert it. So adding the 2,000th child means checking the 1,999 before it, twice.
 
-This makes Ionic's `ion-select` slow to open with long lists, because `ion-radio-group` doesn't use shadow DOM and Ionic turns this setting on through `experimentalSlotFixes`.
+The same behavior makes Ionic's `ion-select` slow to open with long lists, because `ion-radio-group` doesn't use shadow DOM and Ionic turns this setting on through `experimentalSlotFixes`.
 
 Versions: `@stencil/core` 4.45.2.

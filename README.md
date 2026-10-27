@@ -7,7 +7,7 @@ The page has two components that are identical apart from shadow DOM:
 - `<light-list>` uses `shadow: false`, so Stencil replaces its `appendChild` to handle the slot itself.
 - `<shadow-list>` uses `shadow: true`, so the browser's own `appendChild` is used.
 
-## Run it
+To run it:
 
 ```sh
 npm install
@@ -15,8 +15,6 @@ npm start
 ```
 
 Then open the page it serves and press **Run**. It appends 250, 500, 1,000 and 2,000 children to each component, one `appendChild` call at a time, and shows how long each took.
-
-## Expected results
 
 With the CPU slowed down 4x in Chrome 155:
 
@@ -28,8 +26,6 @@ With the CPU slowed down 4x in Chrome 155:
 | 2,000 | 13,818ms | 13ms |
 
 With `appendChildSlotFix: false` in `stencil.config.ts`, both components take under 20ms at every size.
-
-## Cause
 
 Each call to the replaced `appendChild` checks all of the host's existing child nodes to find the slot the new node belongs in, then checks them all again to work out where to insert it. So adding the 2,000th child means checking the 1,999 before it, twice.
 

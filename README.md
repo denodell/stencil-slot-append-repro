@@ -1,6 +1,6 @@
 # appendChildSlotFix repro
 
-With `appendChildSlotFix` turned on, appending children one at a time to a Stencil component that uses slots without shadow DOM gets slower with each child. Doubling the number of children makes it take about four times as long.
+With `appendChildSlotFix` turned on, appending children one at a time to a Stencil component that uses slots without shadow DOM gets slower with each child. Doubling the number of children makes it take three to four times as long.
 
 The page has two components that are identical apart from shadow DOM:
 
